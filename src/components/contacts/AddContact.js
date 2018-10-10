@@ -50,6 +50,8 @@ export default class AddContact extends Component {
       tel: "",
       errors: {}
     });
+
+    this.props.history.push("/");
   };
 
   render() {
