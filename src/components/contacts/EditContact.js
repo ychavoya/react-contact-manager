@@ -3,13 +3,29 @@ import { Consumer } from "../../context";
 import TextInputGroup from "../layout/TextInputGroup";
 import axios from "axios";
 
-export default class AddContact extends Component {
+export default class EditContact extends Component {
   state = {
     name: "",
     email: "",
     phone: "",
     errors: {}
   };
+
+  async componentDidMount() {
+    const { id } = this.props.match.params;
+
+    let res = await axios.get(
+      `https://jsonplaceholder.typicode.com/users/${id}`
+    );
+
+    const { name, email, phone } = res.data;
+
+    this.setState({
+      name,
+      email,
+      phone
+    });
+  }
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
 
@@ -32,19 +48,21 @@ export default class AddContact extends Component {
       return;
     }
 
-    const nuevoContacto = {
+    const update = {
       name,
       email,
       phone
     };
 
-    let res = await axios.post(
-      "https://jsonplaceholder.typicode.com/users",
-      nuevoContacto
+    const { id } = this.props.match.params;
+
+    let res = await axios.put(
+      `https://jsonplaceholder.typicode.com/users/${id}`,
+      update
     );
 
     dispatch({
-      type: "ADD_CONTACT",
+      type: "UPDATE_CONTACT",
       payload: res.data
     });
 
@@ -67,7 +85,7 @@ export default class AddContact extends Component {
           const { dispatch } = value;
           return (
             <div className="card mb-3">
-              <div className="card-header">Agregar contacto</div>
+              <div className="card-header">Editar contacto</div>
               <div className="card-body">
                 <form onSubmit={this.onSubmit.bind(this, dispatch)}>
                   <TextInputGroup
@@ -98,7 +116,7 @@ export default class AddContact extends Component {
                   <input
                     type="submit"
                     className="btn btn-block btn-light"
-                    value="Agregar Contacto"
+                    value="Actualizar"
                   />
                 </form>
               </div>

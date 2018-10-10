@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Consumer } from "../../context";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default class Contact extends Component {
   state = {
@@ -9,9 +11,9 @@ export default class Contact extends Component {
 
   static defaultProps = {
     contacto: {
-      nombre: "Nombre",
+      name: "Nombre",
       email: "nombre@ejemplo.com",
-      tel: "1234 5678"
+      phone: "1234 5678"
     }
   };
 
@@ -25,15 +27,20 @@ export default class Contact extends Component {
     });
   };
 
-  onDeleteClick = (id, dispatch) => {
-    dispatch({
-      type: "DELETE_CONTACT",
-      payload: id
-    });
+  onDeleteClick = async (id, dispatch) => {
+    try {
+      await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
+    } catch (e) {
+    } finally {
+      dispatch({
+        type: "DELETE_CONTACT",
+        payload: id
+      });
+    }
   };
 
   render() {
-    const { id, nombre, email, tel } = this.props.contacto;
+    const { id, name, email, phone } = this.props.contacto;
 
     const { showContactInfo } = this.state;
 
@@ -44,7 +51,7 @@ export default class Contact extends Component {
           return (
             <div className="card card-body mb-3">
               <h4>
-                {nombre}{" "}
+                {name}{" "}
                 <i
                   style={{ cursor: "pointer" }}
                   onClick={this.onShowClick}
@@ -55,11 +62,22 @@ export default class Contact extends Component {
                   onClick={this.onDeleteClick.bind(this, id, dispatch)}
                   className="fas fa-times"
                 />
+                <Link to={`contact/edit/${id}`}>
+                  <i
+                    style={{
+                      cursor: "pointer",
+                      float: "right",
+                      color: "green",
+                      marginRight: "1rem"
+                    }}
+                    className="fas fa-pencil-alt"
+                  />
+                </Link>
               </h4>
               {showContactInfo ? (
                 <ul className="list-group">
                   <li className="list-group-item">Email: {email}</li>
-                  <li className="list-group-item">Teléfono: {tel}</li>
+                  <li className="list-group-item">Teléfono: {phone}</li>
                 </ul>
               ) : null}
             </div>
